@@ -26,6 +26,7 @@ def require_api_key(f):
                 {
                     "error": "Configuración error",
                     "message": "API no configurada correctamente",
+                    "expected": f"{expected_key}",
                 }
             ), 500
 
