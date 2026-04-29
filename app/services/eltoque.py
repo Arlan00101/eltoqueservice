@@ -25,10 +25,10 @@ class ElToqueClient:
         return response.json()
 
     def get_tasas_historico(
-        self, fecha_inicio: str, fecha_fin: str, tipo: str = "informal"
+        self, date_from: str, date_to: str
     ) -> List[Dict[str, Any]]:
-        endpoint = f"{self.base_url}/tasas/historico"
-        params = {"fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin, "tipo": tipo}
+        endpoint = f"{self.base_url}/trmi"
+        params = {"date_from": date_from, "date_to": date_to}
         response = requests.get(
             endpoint, headers=self.headers, params=params, timeout=30
         )
