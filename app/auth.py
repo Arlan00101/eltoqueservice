@@ -6,12 +6,16 @@ def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         api_key = request.headers.get("X-API-Key")
+        auth_header = request.headers.get("Authorization", "")
+
+        if auth_header.startswith("Bearer "):
+            return f(*args, **kwargs)
 
         if not api_key:
             return jsonify(
                 {
                     "error": "API Key requerida",
-                    "message": "Debe proporcionar una API Key en el header X-API-Key",
+                    "message": "Debe proporcionar una API Key en el header X-API-Key o Authorization: Bearer <token>",
                 }
             ), 401
 
