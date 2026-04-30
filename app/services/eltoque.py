@@ -1,42 +1,28 @@
 import requests
-from typing import Optional, Dict, Any, List
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+from typing import Dict, Any
 from app.config import Config
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
 class ElToqueClient:
-    def __init__(self, api_key: Optional[str] = None):
-        self.api_key = api_key or Config.ELTOQUE_API_KEY
+    def __init__(self):
         self.base_url = Config.ELTOQUE_API_URL
+        self.api_key = Config.ELTOQUE_API_KEY
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
+        self.session = requests.Session()
+        retry = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+        adapter = HTTPAdapter(max_retries=retry)
+        self.session.mount("https://", adapter)
 
-    def get_tasas_informales(self) -> Dict[str, Any]:
-        endpoint = f"{self.base_url}/tasas/informal"
-        response = requests.get(endpoint, headers=self.headers, timeout=30)
+    def get_trmi(self) -> Dict[str, Any]:
+        endpoint = f"{self.base_url}/v1/trmi"
+        response = self.session.get(endpoint, headers=self.headers, timeout=30, verify=False)
         response.raise_for_status()
         return response.json()
-
-    def get_tasas_oficiales(self) -> Dict[str, Any]:
-        endpoint = f"{self.base_url}/tasas/oficial"
-        response = requests.get(endpoint, headers=self.headers, timeout=30)
-        response.raise_for_status()
-        return response.json()
-
-    def get_tasas_historico(
-        self, date_from: str, date_to: str
-    ) -> List[Dict[str, Any]]:
-        endpoint = f"{self.base_url}/trmi"
-        params = {"date_from": date_from, "date_to": date_to}
-        response = requests.get(
-            endpoint, headers=self.headers, params=params, timeout=30
-        )
-        response.raise_for_status()
-        return response.json()
-
-    def get_all_tasas(self) -> Dict[str, Any]:
-        return {
-            "informal": self.get_tasas_informales(),
-            "oficial": self.get_tasas_oficiales(),
-        }

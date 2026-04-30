@@ -5,7 +5,7 @@ load_dotenv()
 
 
 class Config:
-    ELTOQUE_API_URL = os.getenv("ELTOQUE_API_URL", "https://tasas.eltoque.com/api/v1")
+    ELTOQUE_API_URL = os.getenv("ELTOQUE_API_URL", "https://tasas.eltoque.com")
     ELTOQUE_API_KEY = os.getenv("ELTOQUE_API_KEY", "")
     API_KEY = os.getenv("API_KEY", "")
     DEBUG = os.getenv("DEBUG", "False").lower() == "true"
